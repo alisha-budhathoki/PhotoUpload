@@ -1,6 +1,7 @@
 # profile_upload
 
-A new Flutter application.
+A new Flutter application. 
+This application illustrates how we can upload and crop image in flutter
 
 ## Getting Started
 
