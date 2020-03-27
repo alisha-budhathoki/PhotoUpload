@@ -5,6 +5,8 @@ import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 import 'package:path/path.dart' as Path;
 import 'package:image_picker/image_picker.dart';
+import 'package:profile_upload/AfterUploading.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 
 class PhotoProfileUpload extends StatelessWidget {
@@ -166,6 +168,17 @@ class _MyProfilePage extends State<MyProfilePage> {
 
 
   Future uploadImage() async {
+    ProgressDialog pr;
+    pr = new ProgressDialog(context);
+    pr.style(
+      message: 'Please wait...',
+      borderRadius: 10.0,
+      backgroundColor: Colors.white,
+      progressWidget: CircularProgressIndicator(),
+      elevation: 10.0,
+    );
+    pr.show();
+
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .child('profile_image/${Path.basename(imageFile.path)}}');
@@ -174,6 +187,12 @@ class _MyProfilePage extends State<MyProfilePage> {
     print('File Uploaded');
     storageReference.getDownloadURL().then((fileURL) {
       print("Successfull2");
+      pr.hide();
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AfterUploading(),));
+
     });
   }
 
