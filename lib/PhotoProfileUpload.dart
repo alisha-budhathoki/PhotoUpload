@@ -1,8 +1,9 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
-
+import 'package:path/path.dart' as Path;
 import 'package:image_picker/image_picker.dart';
 
 
@@ -68,9 +69,11 @@ class _MyProfilePage extends State<MyProfilePage> {
               FileImage(imageFile),
             ),
           ),
+          
           SizedBox(height: 10,),
-          Text('Harry Hanks',style: TextStyle(fontSize: 20),)
-        ],
+          Text('Harry Hanks',style: TextStyle(fontSize: 20),),
+          RaisedButton(child: Text('Save',style: TextStyle(color: Colors.white),),onPressed: uploadImage)
+          ],
       ),
     )
 
@@ -160,6 +163,20 @@ class _MyProfilePage extends State<MyProfilePage> {
       });
     }
   }
+
+
+  Future uploadImage() async {
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('profile_image/${Path.basename(imageFile.path)}}');
+    StorageUploadTask uploadTask = storageReference.putFile(imageFile);
+    await uploadTask.onComplete;
+    print('File Uploaded');
+    storageReference.getDownloadURL().then((fileURL) {
+      print("Successfull2");
+    });
+  }
+
 }
 
 
