@@ -6,40 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path/path.dart' as Path;
 import 'package:image_picker/image_picker.dart';
-import 'package:profile_upload/AfterUploading.dart';
+import 'package:profile_upload/after_uploading.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
-
-class PhotoProfileUpload extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Edit Profile',
-      theme: ThemeData.light().copyWith(primaryColor: Colors.teal),
-      home: MyProfilePage(
-        title: 'ImageCropper',
-      ),
-    );
-  }
-}
-
-class MyProfilePage extends StatefulWidget {
-  final String title;
-
-  MyProfilePage({this.title});
+class ProfileUpload extends StatefulWidget {
 
   @override
   _MyProfilePage createState() => _MyProfilePage();
 }
+
 enum AppState {
   free,
   picked,
   cropped,
 }
 
-class _MyProfilePage extends State<MyProfilePage> {
+class _MyProfilePage extends State<ProfileUpload> {
   AppState state;
-  File imageFile;
+  File _image;
+
 
   @override
   void initState() {
@@ -51,40 +36,50 @@ class _MyProfilePage extends State<MyProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-        title: Text(widget.title),
-    ),
-    body:Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 40,),
-          InkWell(
-            onTap: (){
-                _onAlertPress();
-
-            },
-            child: CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.white,
-              backgroundImage:  imageFile == null?
-              AssetImage(
-                  'assets/images/user_img_register.png'):
-              FileImage(imageFile),
-            ),
+          backgroundColor: Colors.teal,
+          title: Text('Hello world'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                height: 40,
+              ),
+              InkWell(
+                onTap: () {
+                  _onAlertPress();
+                },
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.white,
+                  backgroundImage: _image == null
+                      ? AssetImage('assets/images/user_img_register.png')
+                      : FileImage(_image),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Harry Hanks',
+                style: TextStyle(fontSize: 20),
+              ),
+              RaisedButton(
+                onPressed: uploadImage,
+                color: Colors.teal,
+                child: Text(
+                  'Save',
+                  style: TextStyle(color: Colors.white),
+                ),
+                //onPressed: uploadImage
+              )
+            ],
           ),
-          
-          SizedBox(height: 10,),
-          Text('Harry Hanks',style: TextStyle(fontSize: 20),),
-          RaisedButton(child: Text('Save',style: TextStyle(color: Colors.white),),onPressed: uploadImage)
-          ],
-      ),
-    )
-
-
-    );
+        ));
   }
 
-  void _onAlertPress() async{
+  void _onAlertPress() async {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -92,44 +87,61 @@ class _MyProfilePage extends State<MyProfilePage> {
             actions: [
               Column(
                 children: <Widget>[
-                  InkWell(child: Container(child: Text('Gallery',)),onTap: getGalleryImage,),
-                  InkWell(child: Text('Take Photo'), onTap: getCameraImage,)
-
+                  InkWell(
+                    child: Container(
+                        child: Text(
+                          'Gallery',
+                        )),
+                    onTap: getGalleryImage,
+                  ),
+                  InkWell(
+                    child: Text('Take Photo'),
+                    onTap: getCameraImage,
+                  )
                 ],
               ),
             ],
           );
         });
   }
-  Future getCameraImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
-    if (imageFile != null) {
-      setState(() {
-        state = AppState.picked;
-      });
-      if(state == AppState.picked){
-        _cropImage();
-      }
 
-    }
+  Future getCameraImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      _image = image;
+      Navigator.pop(context);
+      if(_image != null){
+        setState(() {
+          state = AppState.picked;
+        });
+        if (state == AppState.picked) {
+          _cropImage();
+        }
+      }
+    });
   }
 
   //============================== Image from gallery
   Future getGalleryImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
-    if (imageFile != null) {
-      setState(() {
-        state = AppState.picked;
-      });
-      if(state == AppState.picked){
-        _cropImage();
-      }
-    }
-  }
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
+    setState(() {
+      _image = image;
+      Navigator.pop(context);
+      if(_image != null){
+        setState(() {
+          state = AppState.picked;
+        });
+        if (state == AppState.picked) {
+          _cropImage();
+        }
+      }
+    });
+  }
   Future<Null> _cropImage() async {
     File croppedFile = await ImageCropper.cropImage(
-        sourcePath: imageFile.path,
+        sourcePath: _image.path,
         aspectRatioPresets: Platform.isAndroid
             ? [
           CropAspectRatioPreset.square,
@@ -156,16 +168,14 @@ class _MyProfilePage extends State<MyProfilePage> {
             lockAspectRatio: false),
         iosUiSettings: IOSUiSettings(
           title: 'Cropper',
-        )
-    );
+        ));
     if (croppedFile != null) {
-      imageFile = croppedFile;
+      _image = croppedFile;
       setState(() {
         state = AppState.cropped;
       });
     }
   }
-
 
   Future uploadImage() async {
     ProgressDialog pr;
@@ -181,8 +191,8 @@ class _MyProfilePage extends State<MyProfilePage> {
 
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
-        .child('profile_image/${Path.basename(imageFile.path)}}');
-    StorageUploadTask uploadTask = storageReference.putFile(imageFile);
+        .child('profile_image/${Path.basename(_image.path)}}');
+    StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
     print('File Uploaded');
     storageReference.getDownloadURL().then((fileURL) {
@@ -191,10 +201,8 @@ class _MyProfilePage extends State<MyProfilePage> {
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AfterUploading(),));
+            builder: (context) => AfterUploading(),
+          ));
     });
   }
-
 }
-
-
