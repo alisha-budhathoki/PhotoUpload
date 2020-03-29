@@ -85,26 +85,74 @@ class _MyProfilePage extends State<ProfileUpload> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-            actions: [
-              Column(
-                children: <Widget>[
-                  InkWell(
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                BorderRadius.circular(20.0)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                InkWell(
+                  onTap: (){
+                    getCameraImage();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical:10),
                     child: Container(
-                        child: Text(
-                          'Gallery',
-                        )),
-                    onTap: getGalleryImage,
+                      child: Text('Take Photo'),
+                    ),
                   ),
-                  InkWell(
-                    child: Text('Take Photo'),
-                    onTap: getCameraImage,
-                  )
-                ],
-              ),
-            ],
+                ),
+                Divider(height: 7, color: Colors.grey,),
+                InkWell(
+                  onTap: (){
+                    getGalleryImage();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical:10),
+                    child: Container(
+                      child: Text('Gallery'),
+                    ),
+                  ),
+                ),
+                Divider(height: 7, color: Colors.grey,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical:10),
+                  child: InkWell(
+                    onTap: (){Navigator.pop(context);},
+                    child: Container(
+                      child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold),),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         });
+//
+//    showDialog(
+//        context: context,
+//        builder: (BuildContext context) {
+//          return new AlertDialog(
+//            actions: [
+//              Column(
+//                children: <Widget>[
+//                  InkWell(
+//                    child: Container(
+//                        child: Text(
+//                          'Gallery',
+//                        )),
+//                    onTap: getGalleryImage,
+//                  ),
+//                  InkWell(
+//                    child: Text('Take Photo'),
+//                    onTap: getCameraImage,
+//                  )
+//                ],
+//              ),
+//            ],
+//          );
+//        });
   }
 
   Future getCameraImage() async {
