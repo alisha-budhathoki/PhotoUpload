@@ -39,7 +39,7 @@ class _MyProfilePage extends State<ProfileUpload> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.teal,
-          title: Text('Hello world'),
+          title: Center(child: Text('Hello world')),
         ),
         body: Center(
           child: Column(
@@ -113,21 +113,13 @@ class _MyProfilePage extends State<ProfileUpload> {
     setState(() {
       _image = image;
       Navigator.pop(context);
-      if(_image != null){
-        setState(() {
-          state = AppState.picked;
-        });
-        if (state == AppState.picked) {
-          _cropImage();
-        }
-      }
+      _cropImage();
     });
   }
 
   //============================== Image from gallery
   Future getGalleryImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-
     setState(() {
       _image = image;
       Navigator.pop(context);

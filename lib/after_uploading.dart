@@ -69,17 +69,20 @@ class _AfterUploading extends State<AfterUploading> {
                 ),
               ],
             ),
-            RaisedButton(color: Colors.teal,
-              onPressed: (){
-                Navigator.pop(context);
-              },
-              child: Text(
-                'Back',
-                style: TextStyle(
-                  color: Colors.white
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: RaisedButton(color: Colors.teal,
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Back',
+                  style: TextStyle(
+                    color: Colors.white
+                  ),
                 ),
-              ),
 
+              ),
             )
           ],
         ),
