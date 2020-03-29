@@ -131,14 +131,16 @@ class _MyProfilePage extends State<ProfileUpload> {
     setState(() {
       _image = image;
       Navigator.pop(context);
-      if(_image != null){
-        setState(() {
-          state = AppState.picked;
-        });
-        if (state == AppState.picked) {
-          _cropImage();
-        }
-      }
+                _cropImage();
+
+//      if(_image != null){
+//        setState(() {
+//          state = AppState.picked;
+//        });
+//        if (state == AppState.picked) {
+//          _cropImage();
+//        }
+//      }
     });
   }
   Future<Null> _cropImage() async {
@@ -204,7 +206,7 @@ class _MyProfilePage extends State<ProfileUpload> {
     prefs.setString('url', url);
 
     print("Successfull2");
-      Fluttertoast.showToast(msg: "Your image is uploaded successfully");
+      Fluttertoast.showToast(msg: "Image uploaded successfully");
       pr.hide();
       Navigator.push(
           context,
