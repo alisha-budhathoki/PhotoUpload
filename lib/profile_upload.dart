@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path/path.dart' as Path;
 import 'package:image_picker/image_picker.dart';
 import 'package:profile_upload/after_uploading.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileUpload extends StatefulWidget {
 
@@ -195,14 +197,19 @@ class _MyProfilePage extends State<ProfileUpload> {
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
     print('File Uploaded');
-    storageReference.getDownloadURL().then((fileURL) {
-      print("Successfull2");
+    String url;
+    var dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
+    url = dowurl.toString();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('url', url);
+
+    print("Successfull2");
+      Fluttertoast.showToast(msg: "Your image is uploaded successfully");
       pr.hide();
       Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AfterUploading(),
           ));
-    });
   }
 }
