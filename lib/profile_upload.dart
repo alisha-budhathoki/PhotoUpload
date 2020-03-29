@@ -156,7 +156,7 @@ class _MyProfilePage extends State<ProfileUpload> {
   }
 
   Future getCameraImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var image = await ImagePicker.pickImage(source: ImageSource.camera, maxHeight: 200, maxWidth: 200);
 
     setState(() {
       _image = image;
@@ -167,7 +167,7 @@ class _MyProfilePage extends State<ProfileUpload> {
 
   //============================== Image from gallery
   Future getGalleryImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery, maxHeight: 200, maxWidth: 200);
     setState(() {
       _image = image;
       Navigator.pop(context);
