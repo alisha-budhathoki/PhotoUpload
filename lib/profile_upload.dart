@@ -12,7 +12,6 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileUpload extends StatefulWidget {
-
   @override
   _MyProfilePage createState() => _MyProfilePage();
 }
@@ -24,9 +23,11 @@ enum AppState {
 }
 
 class _MyProfilePage extends State<ProfileUpload> {
+  String imagePath2 = "assets/images/user_img_register.png";
+  String buttonText = "Save";
   AppState state;
   File _image;
-
+  String _uploadedFileURL;
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class _MyProfilePage extends State<ProfileUpload> {
                   radius: 60,
                   backgroundColor: Colors.white,
                   backgroundImage: _image == null
-                      ? AssetImage('assets/images/user_img_register.png')
+                      ? AssetImage(imagePath2)
                       : FileImage(_image),
                 ),
               ),
@@ -75,7 +76,14 @@ class _MyProfilePage extends State<ProfileUpload> {
                   style: TextStyle(color: Colors.white),
                 ),
                 //onPressed: uploadImage
-              )
+              ),
+              Text('Uploaded Image'),
+              _uploadedFileURL != null
+                  ? Image.network(
+                      _uploadedFileURL,
+                      height: 150,
+                    )
+                  : Container(),
             ],
           ),
         ));
@@ -87,41 +95,51 @@ class _MyProfilePage extends State<ProfileUpload> {
         builder: (BuildContext context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-                borderRadius:
-                BorderRadius.circular(20.0)),
+                borderRadius: BorderRadius.circular(20.0)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 InkWell(
-                  onTap: (){
+                  onTap: () {
                     getCameraImage();
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical:10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Container(
                       child: Text('Take Photo'),
                     ),
                   ),
                 ),
-                Divider(height: 7, color: Colors.grey,),
+                Divider(
+                  height: 7,
+                  color: Colors.grey,
+                ),
                 InkWell(
-                  onTap: (){
+                  onTap: () {
                     getGalleryImage();
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical:10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Container(
                       child: Text('Gallery'),
                     ),
                   ),
                 ),
-                Divider(height: 7, color: Colors.grey,),
+                Divider(
+                  height: 7,
+                  color: Colors.grey,
+                ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical:10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: InkWell(
-                    onTap: (){Navigator.pop(context);},
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                     child: Container(
-                      child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold),),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ),
@@ -129,35 +147,22 @@ class _MyProfilePage extends State<ProfileUpload> {
             ),
           );
         });
-//
-//    showDialog(
-//        context: context,
-//        builder: (BuildContext context) {
-//          return new AlertDialog(
-//            actions: [
-//              Column(
-//                children: <Widget>[
-//                  InkWell(
-//                    child: Container(
-//                        child: Text(
-//                          'Gallery',
-//                        )),
-//                    onTap: getGalleryImage,
-//                  ),
-//                  InkWell(
-//                    child: Text('Take Photo'),
-//                    onTap: getCameraImage,
-//                  )
-//                ],
-//              ),
-//            ],
-//          );
-//        });
   }
 
   Future getCameraImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera, maxHeight: 200, maxWidth: 200);
+    var image = await ImagePicker.pickImage(
+        source: ImageSource.camera, maxHeight: 200, maxWidth: 200);
+    setState(() {
+      _image = image;
+      _cropImage();
+      Navigator.pop(context);
+    });
+  }
 
+  //============================== Image from gallery
+  Future getGalleryImage() async {
+    var image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, maxHeight: 200, maxWidth: 200);
     setState(() {
       _image = image;
       Navigator.pop(context);
@@ -165,51 +170,33 @@ class _MyProfilePage extends State<ProfileUpload> {
     });
   }
 
-  //============================== Image from gallery
-  Future getGalleryImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery, maxHeight: 200, maxWidth: 200);
-    setState(() {
-      _image = image;
-      Navigator.pop(context);
-                _cropImage();
-
-//      if(_image != null){
-//        setState(() {
-//          state = AppState.picked;
-//        });
-//        if (state == AppState.picked) {
-//          _cropImage();
-//        }
-//      }
-    });
-  }
   Future<Null> _cropImage() async {
     File croppedFile = await ImageCropper.cropImage(
         sourcePath: _image.path,
         aspectRatioPresets: Platform.isAndroid
             ? [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
-        ]
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio16x9
+              ]
             : [
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio5x3,
-          CropAspectRatioPreset.ratio5x4,
-          CropAspectRatioPreset.ratio7x5,
-          CropAspectRatioPreset.ratio16x9
-        ],
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio5x3,
+                CropAspectRatioPreset.ratio5x4,
+                CropAspectRatioPreset.ratio7x5,
+                CropAspectRatioPreset.ratio16x9
+              ],
         androidUiSettings: AndroidUiSettings(
             toolbarTitle: 'Cropper',
             toolbarColor: Colors.deepOrange,
             toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false),
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true),
         iosUiSettings: IOSUiSettings(
           title: 'Cropper',
         ));
@@ -239,19 +226,19 @@ class _MyProfilePage extends State<ProfileUpload> {
     StorageUploadTask uploadTask = storageReference.putFile(_image);
     await uploadTask.onComplete;
     print('File Uploaded');
-    String url;
-    var dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
-    url = dowurl.toString();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('url', url);
+    storageReference.getDownloadURL().then((fileURL) {
+      setState(() {
+        _uploadedFileURL = fileURL;
+      });
+//      String url;
+//    var dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
+//    url = dowurl.toString();
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    prefs.setString('url', url);
 
-    print("Successfull2");
+      print("Successfull2");
       Fluttertoast.showToast(msg: "Image uploaded successfully");
       pr.hide();
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AfterUploading(),
-          ));
+    });
   }
 }
